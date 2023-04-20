@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--使用基于时间的日志文件记录-->
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <property name="LOG_HOME" value="logs/pms-web"/>
+
+    <property name="FILE_LOG_PATTERN" value="[%d{yyyy-MM-dd HH:mm:ss}] [%level] [%X{traceId}] [%-22thread]  %logger{35}.%-5L - %msg %n"/>
+
+    <!-- 出错日志 appender  -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <FileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印错误日志 -->
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 访问日志 appender  -->
+<!--    <appender name="ACCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <File>${LOG_HOME}/access.log</File>-->
+<!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--            <FileNamePattern>/${LOG_HOME}/access.%d{yyyy-MM-dd}.log.gz</FileNamePattern>-->
+<!--            <maxHistory>90</maxHistory>-->
+<!--        </rollingPolicy>-->
+<!--        <encoder>-->
+<!--            <Pattern>${FILE_LOG_PATTERN}</Pattern>-->
+<!--        </encoder>-->
+<!--        <filter class="ch.qos.logback.classic.filter.LevelFilter">-->
+<!--            <level>DEBUG</level>-->
+<!--            <onMatch>ACCEPT</onMatch>-->
+<!--            <onMismatch>DENY</onMismatch>-->
+<!--        </filter>-->
+<!--    </appender>-->
+
+    <!-- warn日志 appender  -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/warn.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/warn.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印INFO日志 -->
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- info日志 appender  -->
+    <appender name="INFO" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/info.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_HOME}/info.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <maxHistory>20</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印INFO日志 -->
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- 慢sql -->
+    <appender name="MybatisSlowSql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/mybatis_slow_sql.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <FileNamePattern>${LOG_HOME}/mybatis_slow_sql.log.%d{yyyy-MM-dd}.log.gz</FileNamePattern>
+            <!-- keep 30 days' worth of history -->
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <Pattern>${FILE_LOG_PATTERN}</Pattern>
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter"><!-- 只打印INFO日志 -->
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+    </appender>
+
+    <logger name="com.alibaba.druid.filter.stat.StatFilter" additivity="false">
+        <level value="error"/>
+        <appender-ref ref="MybatisSlowSql"/>
+    </logger>
+
+    <root level="INFO">
+        <springProfile name="test,dev">
+            <appender-ref ref="CONSOLE"/>
+        </springProfile>
+        <appender-ref ref="INFO"/>
+        <appender-ref ref="WARN"/>
+        <!--<appender-ref ref="ACCESS"/>-->
+        <appender-ref ref="ERROR"/>
+    </root>
+
+    <logger name="com.alibaba.dubbo" level="ERROR"/>
+    <logger name="org.apache.http" level="ERROR"/>
+    <logger name="org.apache.zookeeper" level="ERROR"/>
+    <logger name="com.taobao" level="ERROR"/>
+
+    <!-- 测试环境+开发环境. 多个使用逗号隔开. -->
+    <springProfile name="test,dev">
+        <!--打印sql-->
+        <logger name="java.sql.Connection" level="DEBUG" />
+        <logger name="java.sql.PreparedStatement" level="DEBUG" />
+        <logger name="java.sql.ResultSet" level="DEBUG" />
+        <logger name="java.sql.Statement" level="DEBUG" />
+
+    </springProfile>
+</configuration>

@@ -1,0 +1,26 @@
+
+mysql:
+  jdbc:
+    write:
+      url: jdbc:mysql://172.16.0.96:3306/finance
+      username: finance
+      password: Fs8D3#sg28s
+    read:
+      url: jdbc:mysql://172.16.0.96:3306/finance
+      username: finance
+      password: Fs8D3#sg28s
+    initialSize: 5
+    maxActive: 10
+    minIdle: 3
+
+
+dubbo:
+  application:
+    name: ${app.name}
+  registry:
+    address: 127.0.0.1:2181
+    id: registry
+  protocol:
+    name: dubbo
+    port: 20880
+    
