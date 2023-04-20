@@ -32,5 +32,6 @@ public class UserAPIImplTest extends BaseTest {
         result = userAPI.login("", "");
         Assert.assertTrue(result);
         //....
+
     }
 }
